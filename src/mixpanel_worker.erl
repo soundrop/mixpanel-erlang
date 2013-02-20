@@ -15,7 +15,7 @@
 ]).
 
 -define(BATCH_SIZE, 50).
--define(REQUEST_TIMEOUT, 10000).
+-define(REQUEST_TIMEOUT, 2 * 60000).
 -define(FLUSH_TIMEOUT, 60000).
 
 
