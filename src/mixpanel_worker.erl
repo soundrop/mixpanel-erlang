@@ -96,10 +96,10 @@ track_i([]) ->
 	ok;
 track_i(Events) ->
 	case application:get_env(mixpanel, token) of
-		undefined ->
+		{ok, undefined} ->
 			ok;
-		Token ->
-			case track_i(Token, Events) of
+		{ok, Token} ->
+			case track_i(list_to_binary(Token), Events) of
 				ok ->
 					ok;
 				{error, Error} ->
@@ -108,7 +108,8 @@ track_i(Events) ->
 						{events, Events},
 						{exception, {error, Error}},
 						{stacktrace, erlang:get_stacktrace()}
-					])
+					]),
+					ok
 			end
 	end.
 
