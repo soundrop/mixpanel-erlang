@@ -1,0 +1,15 @@
+{application, mixpanel, [
+	{description, "Mixpanel Analytics for Erlang"},
+	{vsn, git},
+	{registered, []},
+	{applications, [
+		kernel,
+		stdlib,
+		jiffy,
+		hackney
+	]},
+	{mod, {mixpanel_app, []}},
+	{env, [
+		{token, undefined}
+	]}
+]}.
