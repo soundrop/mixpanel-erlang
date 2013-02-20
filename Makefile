@@ -38,7 +38,7 @@ ct:
 # Dialyzer
 build-plt:
 	@$(DIALYZER) --build_plt --output_plt .$(PROJECT).plt \
-		--apps erts kernel stdlib inets crypto public_key ssl
+		--apps erts kernel stdlib mnesia inets crypto public_key ssl
 
 dialyze:
 	@$(DIALYZER) --src src --plt .$(PROJECT).plt --no_native \
