@@ -15,6 +15,7 @@
 ]).
 
 -define(BATCH_SIZE, 50).
+-define(REQUEST_TIMEOUT, 10000).
 -define(FLUSH_TIMEOUT, 60000).
 
 
@@ -126,17 +127,36 @@ track_i(Token, Events) ->
 		]}
 	end || {Event, Properties, Timestamp} <- Events], [force_utf8])),
 
-
-	Url = <<"https://api.mixpanel.com/track/">>,
 	Headers = [{<<"content-type">>, <<"x-www-form-urlencoded">>}],
 	Payload = <<"data=", Data/binary>>,
-	Options = [{follow_redirect, true}, {recv_timeout, 60000}],
-	case hackney:request(post, Url, Headers, Payload, Options) of
-		{ok, _Status, _Headers, Client} ->
-			case hackney:body(Client) of
-				{ok, <<"1">>, _} -> ok;
-				_ -> {error, mixpanel_error}
-			end;
-		{error, Error} ->
-			{error, Error}
+	case request_i(post, <<"https://api.mixpanel.com/track/">>, Headers, Payload) of
+		{ok, <<"1">>} -> ok;
+		{ok, _} -> {error, mixpanel_error};
+		Error -> Error
+	end.
+
+%% @private
+request_i(Method, Url, Headers, Payload) ->
+	Ref = erlang:make_ref(),
+	Parent = self(),
+	Pid = spawn(fun() ->
+		Options = [{follow_redirect, true}, {recv_timeout, ?REQUEST_TIMEOUT div 2}],
+		Result = case hackney:request(Method, Url, Headers, Payload, Options) of
+			{ok, _Status, _Headers, Client} ->
+				case hackney:body(Client) of
+					{ok, Body, _} -> {ok, Body};
+					{error, Error} -> {error, Error}
+				end;
+			{error, Error} ->
+				{error, Error}
+		end,
+		Parent ! {Ref, Result}
+	end),
+	receive
+		{Ref, Result} ->
+			Result
+	after
+		?REQUEST_TIMEOUT ->
+			erlang:exit(Pid, timeout),
+			{error, timeout}
 	end.
