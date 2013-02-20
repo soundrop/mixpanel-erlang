@@ -31,7 +31,7 @@ get() ->
 
 %% @hidden
 init([Supervisor, Size]) ->
-	ets:new(?MODULE, [set, public, named_table, {read_concurrency, true}]),
+	_ = ets:new(?MODULE, [set, public, named_table, {read_concurrency, true}]),
 
 	{Workers, _} = lists:mapfoldl(fun(Worker, Id) ->
 		{{{worker, Id}, Worker}, Id + 1}

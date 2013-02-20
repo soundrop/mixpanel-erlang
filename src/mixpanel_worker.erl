@@ -88,7 +88,7 @@ schedule_timeout_i() ->
 cancel_timeout_i(undefined) ->
 	ok;
 cancel_timeout_i(Ref) ->
-	erlang:cancel_timer(Ref),
+	_ = erlang:cancel_timer(Ref),
 	ok.
 
 
