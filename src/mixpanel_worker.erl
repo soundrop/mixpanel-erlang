@@ -115,21 +115,23 @@ track_i(Events) ->
 
 %% @private
 track_i(Token, Events) ->
+	Data = base64:encode(jiffy:encode([begin
+		{[
+			{event, Event},
+			{properties, {[
+				{time, Timestamp},
+				{token, Token} |
+				Properties
+			]}}
+		]}
+	end || {Event, Properties, Timestamp} <- Events], [force_utf8])),
+
+
 	Url = <<"https://api.mixpanel.com/track/">>,
-	Payload = {form, [
-		{data, jiffy:encode([begin
-				{[
-					{event, Event},
-					{properties, {[
-						{time, Timestamp},
-						{token, Token} |
-						Properties
-					]}}
-				]}
-			end || {Event, Properties, Timestamp} <- Events], [force_utf8])}
-	]},
+	Headers = [{<<"content-type">>, <<"x-www-form-urlencoded">>}],
+	Payload = <<"data=", Data/binary>>,
 	Options = [{follow_redirect, true}, {recv_timeout, 60000}],
-	case hackney:request(post, Url, [], Payload, Options) of
+	case hackney:request(post, Url, Headers, Payload, Options) of
 		{ok, _Status, _Headers, Client} ->
 			case hackney:body(Client) of
 				{ok, <<"1">>, _} -> ok;
