@@ -10,6 +10,7 @@
 	]},
 	{mod, {mixpanel_app, []}},
 	{env, [
+		{workers, 10},
 		{token, undefined}
 	]}
 ]}.

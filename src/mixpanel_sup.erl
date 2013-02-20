@@ -19,10 +19,11 @@ start_link() ->
 
 %% @hidden
 init(app) ->
+	WorkersCount = application:get_env(mixpanel, workers),
 	{ok, {
 		{one_for_all, 5, 10}, [
 			?SUPERVISOR(workers_sup, mixpanel_workers_sup),
-			?WORKER(mixpanel_workers, start_link, [10, mixpanel_workers_sup], permanent)
+			?WORKER(mixpanel_workers, start_link, [mixpanel_workers_sup, WorkersCount], permanent)
 		]
 	}};
 init(workers_sup) ->
