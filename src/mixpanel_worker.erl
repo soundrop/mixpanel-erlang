@@ -14,6 +14,9 @@
 	code_change/3
 ]).
 
+-define(BATCH_SIZE, 50).
+-define(FLUSH_TIMEOUT, 60000).
+
 
 -type event()      :: {Name :: binary(), mixpanel:properties(), non_neg_integer()}.
 -record(state, {
@@ -43,7 +46,7 @@ handle_call(_Request, _From, State) ->
 	{stop, unknown_request, State}.
 
 %% @hidden
-handle_cast({track, Event}, #state{pending = Pending} = State) when length(Pending) < 50 ->
+handle_cast({track, Event}, #state{pending = Pending} = State) when length(Pending) < ?BATCH_SIZE ->
 	cancel_timeout_i(State#state.timeout),
 	{noreply, State#state{
 		timeout = schedule_timeout_i(),
@@ -78,7 +81,7 @@ code_change(_Old, State, _Extra) ->
 
 %% @private
 schedule_timeout_i() ->
-	erlang:start_timer(60000, self(), flush).
+	erlang:start_timer(?FLUSH_TIMEOUT, self(), flush).
 
 %% @private
 cancel_timeout_i(undefined) ->
