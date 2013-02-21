@@ -47,7 +47,7 @@ handle_call(_Request, _From, State) ->
 	{stop, unknown_request, State}.
 
 %% @hidden
-handle_cast({track, Event}, #state{pending = Pending} = State) when length(Pending) < ?BATCH_SIZE ->
+handle_cast({track, Event}, #state{pending = Pending} = State) when length(Pending) < (?BATCH_SIZE - 1) ->
 	cancel_timeout_i(State#state.timeout),
 	{noreply, State#state{
 		timeout = schedule_timeout_i(),
