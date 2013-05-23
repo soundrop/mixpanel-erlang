@@ -1,45 +1,38 @@
 PROJECT = mixpanel
 
-DIALYZER = dialyzer
-REBAR = ./rebar
-
 all: app
 
 # Application
-deps:
-	@$(REBAR) get-deps
+rebar:
+	wget https://raw.github.com/wiki/rebar/rebar/rebar && chmod u+x rebar
+
+deps: rebar
+	@./rebar get-deps
 
 app: deps
-	@$(REBAR) compile
+	@./rebar compile
 
 clean:
-	@$(REBAR) clean
+	@./rebar clean
 	rm -f test/*.beam
 	rm -f erl_crash.dump
-
-docs: clean-docs
-	@$(REBAR) doc skip_deps=true
-
-clean-docs:
-	rm -f doc/*.css
-	rm -f doc/*.html
-	rm -f doc/*.png
-	rm -f doc/edoc-info
 
 # Tests
 tests: clean app eunit ct
 
 eunit:
-	@$(REBAR) eunit skip_deps=true
+	@./rebar eunit skip_deps=true
 
 ct:
-	@$(REBAR) ct skip_deps=true
+	@./rebar ct skip_deps=true
 
 # Dialyzer
 build-plt:
-	@$(DIALYZER) --build_plt --output_plt .$(PROJECT).plt \
+	@dialyzer --build_plt --output_plt .$(PROJECT).plt \
 		--apps erts kernel stdlib mnesia inets crypto public_key ssl
 
 dialyze:
-	@$(DIALYZER) --src src --plt .$(PROJECT).plt --no_native \
+	@dialyzer --src src --plt .$(PROJECT).plt --no_native \
 		-Werror_handling -Wrace_conditions -Wunmatched_returns
+
+.PHONY: app clean
