@@ -19,7 +19,7 @@
 -define(FLUSH_TIMEOUT, 60000).
 
 
--type event()      :: {Name :: binary(), mixpanel:properties(), non_neg_integer()}.
+-type event()      :: {Name :: atom(), mixpanel:properties(), non_neg_integer()}.
 -record(state, {
 	timeout  :: undefined | reference(),
 	pending  :: [event()]
@@ -30,7 +30,7 @@
 start_link() ->
 	gen_server:start_link(?MODULE, [], []).
 
--spec track(pid(), binary(), mixpanel:properties(), erlang:timestamp()) -> ok.
+-spec track(pid(), atom(), mixpanel:properties(), erlang:timestamp()) -> ok.
 track(Pid, EventName, Properties, {MegaSecs, Secs, _}) ->
 	gen_server:cast(Pid, {track, {EventName, Properties, MegaSecs * 1000000 + Secs}}).
 

@@ -11,10 +11,10 @@
 -type properties() :: [property()].
 
 
--spec track(binary(), properties()) -> ok.
+-spec track(atom(), properties()) -> ok.
 track(Event, Properties) ->
 	track(Event, Properties, os:timestamp()).
 
--spec track(binary(), properties(), erlang:timestamp()) -> ok.
+-spec track(atom(), properties(), erlang:timestamp()) -> ok.
 track(Event, Properties, Timestamp) ->
 	mixpanel_worker:track(mixpanel_workers:get(), Event, Properties, Timestamp).
