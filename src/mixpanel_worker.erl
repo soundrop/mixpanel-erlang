@@ -143,10 +143,7 @@ request_i(Method, Url, Headers, Payload) ->
 		Options = [{follow_redirect, true}, {recv_timeout, ?REQUEST_TIMEOUT div 2}],
 		Result = case hackney:request(Method, Url, Headers, Payload, Options) of
 			{ok, _Status, _Headers, Client} ->
-				case hackney:body(Client) of
-					{ok, Body, _} -> {ok, Body};
-					{error, Error} -> {error, Error}
-				end;
+				hackney:body(Client);
 			{error, Error} ->
 				{error, Error}
 		end,
